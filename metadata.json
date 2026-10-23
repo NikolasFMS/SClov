@@ -1,0 +1,6 @@
+{
+  "name": "Удачные слова (So Clover!)",
+  "description": "Помощник для игры So Clover! (Удачные слова) — создание клеверов, ассоциации, чередование ведущего и команды, подсчёт очков и сохранение прогресса.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

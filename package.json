@@ -1,0 +1,19 @@
+{
+  "name": "react-example",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port=3000 --host=0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview",
+    "clean": "rm -rf dist server.js",
+    "lint": "node --check src/main.js src/audio.js src/i18n.js src/decks.js src/state.js src/gameLogic.js src/timer.js src/dragDrop.js src/components/*.js src/screens/*.js vite.config.js src/decks/*.js"
+  },
+  "dependencies": {
+    "vite": "^8.3.0"
+  },
+  "devDependencies": {
+    "vite-plugin-pwa": "^2.0.0"
+  }
+}
