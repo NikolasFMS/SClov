@@ -47,19 +47,23 @@ export function renderSummaryScreen() {
     state
   );
 
-  // Distractor fake card display
+  // Reveal every distractor card after the round (also supports legacy saved rounds).
   const fakeEl = document.getElementById("fakeCardContainer");
-  if (fakeEl && round.fakeCard) {
-    fakeEl.innerHTML = renderCardHtml(
-      round.fakeCard,
-      0,
-      {
-        isLocked: false,
-        canRotate: false,
-        isDraggable: false
-      },
-      state.lang
-    );
+  const distractors = Array.isArray(round.distractorCards)
+    ? round.distractorCards
+    : round.fakeCard
+      ? [round.fakeCard]
+      : [];
+  setText("txtFakeCardDesc", t.fakeCardDesc(distractors.length));
+  if (fakeEl) {
+    fakeEl.innerHTML = distractors
+      .map((card) => renderCardHtml(
+        card,
+        0,
+        { isLocked: false, canRotate: false, isDraggable: false },
+        state.lang
+      ))
+      .join("");
   }
 
   // Next round / Finish button text
@@ -122,7 +126,7 @@ export function renderRulesContent() {
       <p style="margin-bottom: 8px;">Игроки по очереди становятся ведущими. Ведущий получает клевер с 4 случайными картами. На четырёх внешних сторонах клевера образуются 4 пары слов (Север, Восток, Юг, Запад). Ведущий тайно придумывает и записывает ровно одно слово-намёк для каждой пары.</p>
       
       <h4 style="color: #4ade80; margin: 12px 0 4px; font-size: 14px;">2. Ловушка и ход команды</h4>
-      <p style="margin-bottom: 8px;">После записи намёков 4 карты снимаются с клевера, перемешиваются с 5-й картой-ловушкой (дистрактором) и передаются команде. Ведущий молчит!</p>
+      <p style="margin-bottom: 8px;">После записи намёков 4 карты снимаются с клевера, перемешиваются с количеством карт-дистракторов, выбранным в настройках сложности, и передаются команде. Ведущий молчит!</p>
       
       <h4 style="color: #4ade80; margin: 12px 0 4px; font-size: 14px;">3. Отгадывание и подсчёт очков</h4>
       <ul style="padding-left: 20px; margin-bottom: 10px; line-height: 1.6;">
@@ -139,7 +143,7 @@ export function renderRulesContent() {
       <p style="margin-bottom: 8px;">Players take turns being the Leader. The leader gets a 4-leaf clover board with 4 cards. 4 pairs of adjacent words are formed along the outer edges (North, East, South, West). The leader secretly writes one association clue for each word pair.</p>
       
       <h4 style="color: #4ade80; margin: 12px 0 4px; font-size: 14px;">2. The Distractor & Team Turn</h4>
-      <p style="margin-bottom: 8px;">The cards are removed, shuffled with a 5th fake distractor card, and handed to the detective team. The leader must remain silent!</p>
+      <p style="margin-bottom: 8px;">The cards are removed, shuffled with the number of distractor cards selected in the difficulty setting, and handed to the detective team. The leader must remain silent!</p>
       
       <h4 style="color: #4ade80; margin: 12px 0 4px; font-size: 14px;">3. Guessing & Scoring</h4>
       <ul style="padding-left: 20px; margin-bottom: 10px; line-height: 1.6;">

@@ -128,6 +128,22 @@
           </div>
         </div>
 
+        <!-- GUESSING DIFFICULTY -->
+        <div class="card-box">
+          <div class="card-box-header">
+            <div class="card-box-title">🧩 <span id="txtGuessingCardsLabel">Карт в лотке для угадывания</span></div>
+          </div>
+          <div class="timer-control-grid guessing-card-options">
+            <button type="button" class="btn-timer-opt btn-guessing-card-opt active" data-distractor-cards="1">+1</button>
+            <button type="button" class="btn-timer-opt btn-guessing-card-opt" data-distractor-cards="2">+2</button>
+            <button type="button" class="btn-timer-opt btn-guessing-card-opt" data-distractor-cards="3">+3</button>
+            <button type="button" class="btn-timer-opt btn-guessing-card-opt" data-distractor-cards="4">+4</button>
+            <button type="button" class="btn-timer-opt btn-guessing-card-opt" data-distractor-cards="5">+5</button>
+            <button type="button" class="btn-timer-opt btn-guessing-card-opt" data-distractor-cards="6">+6</button>
+          </div>
+          <p id="txtGuessingCardsDesc" style="font-size: 11px; color: #94a3b8; margin-top: 8px;">Четыре карты клевера и дополнительные варианты. Настройка общая для всех игроков.</p>
+        </div>
+
         <!-- 4. PLAYERS ROSTER -->
         <div class="card-box">
           <div class="card-box-header">
@@ -300,7 +316,7 @@
               ↺ <span id="txtResetTrayBtn">Сброс в лоток</span>
             </button>
           </div>
-          <div id="trayCardsContainer" class="tray-cards-row"></div>
+          <div id="trayCardsContainer" class="tray-cards-row" tabindex="0" role="region" aria-label="Карты для угадывания"></div>
         </div>
 
         <button type="button" id="btnCheckSolution" class="btn-action-primary" disabled>
@@ -342,13 +358,11 @@
         <!-- Board display for summary -->
         <div id="boardContainerSummary" class="clover-container"></div>
 
-        <!-- Fake card reveal -->
-        <div style="width: 100%; max-width: 440px; background: #090e1a; border: 1px solid #1e293b; border-radius: 16px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px;">
-          <div>
-            <span style="font-size: 11px; font-weight: 800; color: #f59e0b; text-transform: uppercase;" id="txtFakeCardLabel">Ловушка (Дистрактор)</span>
-            <p style="font-size: 11px; color: #94a3b8;" id="txtFakeCardDesc">Пятая лишняя карта, подмешанная в колоду:</p>
-          </div>
-          <div id="fakeCardContainer"></div>
+        <!-- Distractor cards reveal -->
+        <div style="width: 100%; max-width: 440px; background: #090e1a; border: 1px solid #1e293b; border-radius: 16px; padding: 10px 14px; margin-bottom: 14px;">
+          <span style="font-size: 11px; font-weight: 800; color: #f59e0b; text-transform: uppercase;" id="txtFakeCardLabel">Дополнительные карты</span>
+          <p style="font-size: 11px; color: #94a3b8;" id="txtFakeCardDesc">Карты, добавленные для усложнения:</p>
+          <div id="fakeCardContainer" class="summary-distractor-cards"></div>
         </div>
 
         <button type="button" id="btnNextRoundOrFinish" class="btn-action-primary" style="max-width: 440px;">

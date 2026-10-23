@@ -92,6 +92,12 @@ export function renderSetupScreen() {
     btn.classList.toggle("active", val === state.timerSetting);
   });
 
+  // Guessing tray size is a match-wide setting shared by every player.
+  document.querySelectorAll(".btn-guessing-card-opt[data-distractor-cards]").forEach((btn) => {
+    const val = parseInt(btn.getAttribute("data-distractor-cards"), 10);
+    btn.classList.toggle("active", val === state.distractorCardCount);
+  });
+
   // 4. Rounds buttons
   document.querySelectorAll(".btn-round-opt[data-rounds]").forEach((btn) => {
     const val = parseInt(btn.getAttribute("data-rounds"), 10);

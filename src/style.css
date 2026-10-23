@@ -472,6 +472,23 @@ main.app-main {
   }
 }
 
+.guessing-card-options {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.summary-distractor-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.summary-distractor-cards .game-card {
+  width: 84px;
+  height: 84px;
+  flex-shrink: 0;
+}
+
 .btn-timer-opt {
   background: #090e1a;
   border: 1.5px solid #1e293b;
@@ -1235,15 +1252,47 @@ main.app-main {
   display: flex;
   gap: 8px;
   overflow-x: auto;
+  overflow-y: hidden;
   padding: 4px 2px 8px;
   justify-content: flex-start;
   min-height: 124px;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  scrollbar-color: #64748b #1e293b;
+  cursor: grab;
+}
+
+.tray-cards-row:active {
+  cursor: grabbing;
+}
+
+.tray-cards-row:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: 2px;
+}
+
+.tray-cards-row::-webkit-scrollbar {
+  height: 8px;
+}
+
+.tray-cards-row::-webkit-scrollbar-track {
+  background: #1e293b;
+  border-radius: 8px;
+}
+
+.tray-cards-row::-webkit-scrollbar-thumb {
+  background: #64748b;
+  border-radius: 8px;
 }
 
 .tray-cards-row .game-card {
   width: 110px;
   height: 110px;
   flex-shrink: 0;
+  touch-action: pan-x;
+  scroll-snap-align: start;
 }
 
 /* Small adjustments for screen width < 360px */

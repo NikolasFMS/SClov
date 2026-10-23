@@ -93,13 +93,14 @@ export function rerollLeaderCards() {
   if (!round) return;
 
   sounds.tap();
-  const { cloverCards, fakeCard } = generateRoundCards(state);
+  const { cloverCards, fakeCard, distractorCards } = generateRoundCards(state);
 
   round.secretBoard = cloverCards.map((card) => ({
     card,
     rotation: Math.floor(Math.random() * 4)
   }));
   round.fakeCard = fakeCard;
+  round.distractorCards = distractorCards;
   round.clues = { north: "", east: "", south: "", west: "" };
 
   saveState();
@@ -128,16 +129,21 @@ export function finishLeaderWriting(onComplete) {
 
   sounds.tap();
 
-  // Prepare tray: 4 secret cards (random rotation) + 1 fake card
+  // Prepare tray: 4 secret cards plus the configured distractor cards.
+  const distractors = Array.isArray(round.distractorCards)
+    ? round.distractorCards
+    : round.fakeCard
+      ? [round.fakeCard]
+      : [];
   const allCards = [
     ...round.secretBoard.map((s) => ({
       card: s.card,
       rotation: Math.floor(Math.random() * 4)
     })),
-    {
-      card: round.fakeCard,
+    ...distractors.map((card) => ({
+      card,
       rotation: Math.floor(Math.random() * 4)
-    }
+    }))
   ];
 
   round.trayCards = shuffle(allCards);

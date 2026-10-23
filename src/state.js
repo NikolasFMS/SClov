@@ -12,6 +12,7 @@ export const DEFAULT_STATE = {
   selectedDeckIds: ["original"],
   deckMode: "predefined", // "predefined" | "random"
   timerSetting: 120, // 0 = off, 60, 120, 180, 300 seconds
+  distractorCardCount: 1, // number of extra cards in the shared guessing tray
   roundsPerPlayer: 1,
   players: ["Алиса", "Борис", "Вика"],
   screen: "screenSetup",
@@ -45,6 +46,14 @@ export function loadSavedState() {
         if (typeof loaded.timerSetting !== "number") {
           loaded.timerSetting = 120;
         }
+
+        const savedDistractorCount = Number(loaded.distractorCardCount);
+        const legacyTrayCount = Number(loaded.guessingCardCount);
+        loaded.distractorCardCount = Number.isInteger(savedDistractorCount)
+          ? Math.min(6, Math.max(1, savedDistractorCount))
+          : Number.isInteger(legacyTrayCount)
+            ? Math.min(6, Math.max(1, legacyTrayCount - 4))
+            : 1;
 
         const selected = AVAILABLE_DECKS.filter((d) => ids.includes(d.id));
         const hasAnyPredefined = selected.some((d) => d.hasPredefinedCards);

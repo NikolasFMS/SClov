@@ -121,7 +121,7 @@ export function setupRound(roundIndex) {
     .map((d) => (typeof d.name === "object" ? d.name[state.lang] || d.name.ru || d.id : d.name || d.id))
     .join(" + ");
 
-  const { cloverCards, fakeCard } = generateRoundCards(state);
+  const { cloverCards, fakeCard, distractorCards } = generateRoundCards(state);
 
   // Initialize secret board with 4 cards and random rotations
   const secretBoard = cloverCards.map((card) => ({
@@ -138,6 +138,7 @@ export function setupRound(roundIndex) {
     deckMode: state.deckMode,
     secretBoard,
     fakeCard,
+    distractorCards,
     clues: { north: "", east: "", south: "", west: "" },
     attempt: 1,
     teamBoard: [null, null, null, null],
@@ -197,6 +198,7 @@ export function updateLanguageUI() {
   setText("txtModeRandomDesc", t.modeRandomDesc);
   setText("txtDeckNoticeOnlyRandom", t.txtDeckNoticeOnlyRandom);
   setText("txtTimerSelectHeader", t.timerHeader);
+  setText("txtGuessingCardsLabel", t.guessingCardsLabel);
   setText("btnTimer0", t.timerOptOff);
   setText("btnTimer60", t.timerOpt1m);
   setText("btnTimer120", t.timerOpt2m);
@@ -239,7 +241,10 @@ export function updateLanguageUI() {
 
   // Team guessing screen
   setText("txtCloverOfLabel", t.cloverOfLabel);
-  setText("txtTrayTitle", t.trayTitle);
+  const configuredDistractorCount = Math.min(6, Math.max(1, Number(state.distractorCardCount) || 1));
+  const configuredTrayCount = 4 + configuredDistractorCount;
+  setText("txtGuessingCardsDesc", t.guessingCardsDesc(configuredDistractorCount));
+  setText("txtTrayTitle", t.trayTitle(state.activeRound?.trayCards?.length || configuredTrayCount));
   setText("txtTrayHint", t.trayHintDrag);
   setText("txtResetTrayBtn", t.btnResetTray);
   setText("btnTimerAdd30", t.timerAdd30s);
@@ -252,7 +257,8 @@ export function updateLanguageUI() {
   setText("txtOriginalLeader", t.btnOriginalLeader);
   setText("txtTeamGuess", t.btnTeamGuess);
   setText("txtFakeCardLabel", t.fakeCardLabel);
-  setText("txtFakeCardDesc", t.fakeCardDesc);
+  const distractorCount = state.activeRound?.distractorCards?.length || (state.activeRound?.fakeCard ? 1 : configuredTrayCount - 4);
+  setText("txtFakeCardDesc", t.fakeCardDesc(distractorCount));
 
   // Game over screen
   setText("txtGameOverTitle", t.gameOverTitle);
@@ -288,6 +294,17 @@ function setText(id, val) {
 // 5. EVENT LISTENERS
 // ============================================================================
 export function setupEventListeners() {
+  // Make the horizontal card tray accessible with a standard vertical mouse wheel too.
+  const trayCardsContainer = document.getElementById("trayCardsContainer");
+  if (trayCardsContainer) {
+    trayCardsContainer.addEventListener("wheel", (event) => {
+      if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
+        event.preventDefault();
+        trayCardsContainer.scrollLeft += event.deltaY;
+      }
+    }, { passive: false });
+  }
+
   // 1. Header Logo click -> opens confirmation modal
   const btnLogo = document.getElementById("btnHeaderLogo");
   if (btnLogo) {
@@ -423,6 +440,16 @@ export function setupEventListeners() {
     btn.addEventListener("click", () => {
       sounds.tap();
       state.timerSetting = parseInt(btn.getAttribute("data-timer"), 10) || 0;
+      saveState();
+      renderSetupScreen();
+    });
+  });
+
+  // Number of distractor cards in the shared guessing tray.
+  document.querySelectorAll(".btn-guessing-card-opt[data-distractor-cards]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      sounds.tap();
+      state.distractorCardCount = Math.min(6, Math.max(1, parseInt(btn.getAttribute("data-distractor-cards"), 10) || 1));
       saveState();
       renderSetupScreen();
     });

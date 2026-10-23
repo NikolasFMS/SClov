@@ -59,20 +59,26 @@ export function getBoardEdgePairs(slots, lang = "ru") {
 }
 
 /**
- * Generates 5 cards for a round (4 clover cards + 1 fake distractor)
+ * Generates four target cards plus the configured number of distractor cards.
  */
 export function generateRoundCards(state) {
   const selectedDecks = getSelectedDecks(state);
   const hasAnyPredefined = selectedDecks.some((d) => d.hasPredefinedCards);
   const effectiveMode = !hasAnyPredefined ? "random" : state.deckMode;
+  const distractorCount = Number.isInteger(Number(state.distractorCardCount))
+    ? Math.min(6, Math.max(1, Number(state.distractorCardCount)))
+    : Number.isInteger(Number(state.guessingCardCount))
+      ? Math.min(6, Math.max(1, Number(state.guessingCardCount) - 4))
+      : 1;
+  const trayCardCount = 4 + distractorCount;
 
   if (effectiveMode === "predefined" && hasAnyPredefined) {
-    // 1. Ready-made cards from decks that have pre-divided cards
+    // Pick the four target cards plus the configured number of distractors.
     const readyCards = selectedDecks
       .filter((d) => d.hasPredefinedCards)
       .flatMap((d) => d.cards);
 
-    // 2. Dynamically form 4-word cards for word-only decks
+    // Dynamically form 4-word cards for word-only decks selected alongside card decks.
     const wordDecks = selectedDecks.filter((d) => !d.hasPredefinedCards);
     const dynamicCards = [];
     if (wordDecks.length > 0) {
@@ -88,36 +94,42 @@ export function generateRoundCards(state) {
     }
 
     const fullPool = shuffle([...readyCards, ...dynamicCards]);
-    const chosen = fullPool.slice(0, 5);
-    while (chosen.length < 5 && fullPool.length > 0) {
-      chosen.push(fullPool[chosen.length % fullPool.length]);
+    const chosen = fullPool.slice(0, trayCardCount);
+    while (chosen.length < trayCardCount && fullPool.length > 0) {
+      const source = fullPool[chosen.length % fullPool.length];
+      chosen.push({ ...source, id: `${source.id}-copy-${chosen.length}` });
     }
 
+    const distractorCards = chosen.slice(4);
     return {
       cloverCards: chosen.slice(0, 4),
-      fakeCard: chosen[4]
-    };
-  } else {
-    // Mode 'random': pool all words and shuffle
-    const allWords = shuffle(selectedDecks.flatMap((d) => d.wordPairs));
-    const chosenPairs = allWords.slice(0, 20);
-    while (chosenPairs.length < 20 && allWords.length > 0) {
-      chosenPairs.push(...shuffle(allWords).slice(0, 20 - chosenPairs.length));
-    }
-
-    const generated = [];
-    for (let c = 0; c < 5; c++) {
-      const slice = chosenPairs.slice(c * 4, c * 4 + 4);
-      generated.push({
-        id: `rnd-mix-${c + 1}-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`,
-        ru: slice.map((p) => p.ru),
-        en: slice.map((p) => p.en)
-      });
-    }
-
-    return {
-      cloverCards: generated.slice(0, 4),
-      fakeCard: generated[4]
+      distractorCards,
+      fakeCard: distractorCards[0] || null
     };
   }
+
+  // Random mode: generate enough 4-word cards to fill the configured tray.
+  const allWords = shuffle(selectedDecks.flatMap((d) => d.wordPairs));
+  const requiredWords = trayCardCount * 4;
+  const chosenPairs = allWords.slice(0, requiredWords);
+  while (chosenPairs.length < requiredWords && allWords.length > 0) {
+    chosenPairs.push(...shuffle(allWords).slice(0, requiredWords - chosenPairs.length));
+  }
+
+  const generated = [];
+  for (let c = 0; c < trayCardCount; c++) {
+    const slice = chosenPairs.slice(c * 4, c * 4 + 4);
+    generated.push({
+      id: `rnd-mix-${c + 1}-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`,
+      ru: slice.map((p) => p.ru),
+      en: slice.map((p) => p.en)
+    });
+  }
+
+  const distractorCards = generated.slice(4);
+  return {
+    cloverCards: generated.slice(0, 4),
+    distractorCards,
+    fakeCard: distractorCards[0] || null
+  };
 }
