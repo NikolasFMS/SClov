@@ -1,0 +1,41 @@
+export const englishKeywords = [
+  'KONTROLI', 'KUIRI', 'LUDO', 'POMO', 'MINO', 'CIRKLO', 'NEĜO', 'LINIO', 'LIGO', 'PEKINO',
+  'SATELITO', 'POŜLAMPO', 'HAVENO', 'OSTO', 'KAROTO', 'NOKTO', 'MENTO', 'GERMANIO', 'KIVO', 'SPIONO',
+  'PINGVENO', 'MANO', 'RAKETO', 'PRINCINO', 'ACERO', 'LERNEJO', 'AKVO', 'TONO', 'GREKIO', 'POŜTO',
+  'NUKSO', 'VERMO', 'GIGANTO', 'KAMPO', 'CIKLO', 'MUNTI', 'ANGLIO', 'HIMALAJO', 'ROMO', 'AMBASADEJO',
+  'PAPERO', 'TURO', 'DOSIERO', 'DENTO', 'ŜTIPO', 'GENIO', 'LAVUJO', 'KASEROLO', 'PAFO', 'FAKTURO',
+  'HOTEL', 'ŜTELISTO', 'ARANEO', 'PIRATO', 'BUŝO', 'TERO', 'ĈEĤIO', 'GAZO', 'BERO', 'TEMPLO',
+  'FERDEKO', 'LOKO', 'FIGURO', 'RONDA', 'BUTONO', 'MURO', 'VIZAĜO', 'INTRIGO', 'ROMANO', 'SUPERHEROO',
+  'FOIRO', 'TALPO', 'KOKIDO', 'KOSMO', 'USONO', 'AMAZONO', 'MUŜO', 'ŜOFORO', 'VAŜINGTONO', 'BOLTO',
+  'PLAĜO', 'VITRO', 'PUTO', 'SCIENCISTO', 'ARAKIDO', 'GRILO', 'ETIKEDO', 'TOMATOSAŬCO', 'BASTONO', 'LIMAKO',
+  'AFRIKO', 'OPERO', 'REĜINO', 'REVOLUCIO', 'POLUSO', 'TURKIO', 'LITO', 'KOFRO', 'PISTOLO', 'DANCO',
+  'LEĜISTO', 'ŜTATO', 'MALSANO', 'KOLIZIO', 'FLUTO', 'ŜNURO', 'CIMO', 'FORKO', 'KODO', 'UNUKORNULO',
+  'RADIKO', 'SVINGI', 'PASTO', 'TEMPO', 'AZTEKO', 'KELNERO', 'SEĜO', 'REĜO', 'KVADRATO', 'ŜTRUMPETO',
+  'ALPOJ', 'NAJLO', 'TRAJNO', 'TELESKOPO', 'SKATOLO', 'KONTRABANDISTO', 'KRONO', 'AVIADILO', 'ROBOTO', 'SONO',
+  'VENENO', 'TRINKEJO', 'LUDI', 'AGLO', 'KLUBO', 'KATO', 'DINOSAŬRO', 'PARAŜUTO', 'BOJI', 'ANĜELO',
+  'ĈEVALO', 'KRANO', 'NOTO', 'DORSO', 'SOLDATO', 'ORANĜO', 'BUBALO', 'PIANO', 'PARKO', 'BARATO',
+  'FILMO', 'PANTALONO', 'BERLINO', 'TUBO', 'OLEO', 'EKRANO', 'ŜUO', 'CENTRO', 'HOKO', 'EBURO',
+  'BONŜANCO', 'TRUO', 'HUNDO', 'PINGLO', 'ĈINIO', 'URSO', 'HOLIVUDO', 'PINTO', 'MALVARMA', 'GLACIO',
+  'SORĈISTINO', 'PLONĜISTO', 'PIRAMIDO', 'VESPERSO', 'ORO', 'PARTO', 'VAKUO', 'VIVO', 'BRUSTO', 'TRUMPETO'
+];
+
+export const russianKeywords = [
+  'КОНТРОЛИРОВАТЬ', 'ГОТОВИТЬ', 'ИГРА', 'ЯБЛОКО', 'ШАХТА', 'КРУГ', 'СНЕГ', 'ЛИНИЯ', 'СВЯЗЬ', 'ПЕКИН',
+  'СПУТНИК', 'ФОНАРЬ', 'ПОРТ', 'КОСТЬ', 'МОРКОВЬ', 'НОЧЬ', 'МЯТА', 'ГЕРМАНИЯ', 'КИВИ', 'ШПИОН',
+  'ПИНГВИН', 'РУКА', 'РАКЕТА', 'ПРИНЦЕССА', 'КЛЁН', 'ШКОЛА', 'ВОДА', 'ТОН', 'ГРЕЦИЯ', 'ПОЧТА',
+  'ОРЕХ', 'ЧЕРВЬ', 'ГИГАНТ', 'ПОЛЕ', 'ЦИКЛ', 'МОНТИРОВАТЬ', 'АНГЛИЯ', 'ГИМАЛАИ', 'РИМ', 'ПОСОЛЬСТВО',
+  'БУМАГА', 'БАШНЯ', 'ФАЙЛ', 'ЗУБ', 'ПЕНЁК', 'ГЕНИЙ', 'РАКОВИНА', 'КАСТРЮЛЯ', 'ВЫСТРЕЛ', 'СЧЁТ',
+  'ОТЕЛЬ', 'ВОР', 'ПАУК', 'ПИРАТ', 'РОТ', 'ЗЕМЛЯ', 'ЧЕХИЯ', 'ГАЗ', 'ЯГОДА', 'ХРАМ',
+  'ПАЛУБА', 'МЕСТО', 'ФИГУРА', 'КРУГЛЫЙ', 'ПУГОВИЦА', 'СТЕНА', 'ЛИЦО', 'ИНТРИГА', 'РОМАН', 'СУПЕРГЕРОЙ',
+  'ЯРМАРКА', 'КРОТ', 'ЦЫПЛЁНОК', 'КОСМОС', 'США', 'АМАЗОНКА', 'МУХА', 'ВОДИТЕЛЬ', 'ВАШИНГТОН', 'БОЛТ',
+  'ПЛЯЖ', 'СТЕКЛО', 'КОЛОДЕЦ', 'УЧЁНЫЙ', 'АРАХИС', 'СВЕРЧОК', 'ЭТИКЕТКА', 'КЕТЧУП', 'ПАЛКА', 'СЛИЗНЯК',
+  'АФРИКА', 'ОПЕРА', 'КОРОЛЕВА', 'РЕВОЛЮЦИЯ', 'ПОЛЮС', 'ТУРЦИЯ', 'КРОВАТЬ', 'ЧЕМОДАН', 'ПИСТОЛЕТ', 'ТАНЕЦ',
+  'ЮРИСТ', 'ГОСУДАРСТВО', 'БОЛЕЗНЬ', 'СТОЛКНОВЕНИЕ', 'ФЛЕЙТА', 'ВЕРЁВКА', 'КЛОП', 'ВИЛКА', 'КОД', 'ЕДИНОРОГ',
+  'КОРЕНЬ', 'КАЧАТЬ', 'ПАСТОР', 'ВРЕМЯ', 'АЦТЕК', 'ОФИЦИАНТ', 'СТУЛ', 'КОРОЛЬ', 'КВАДРАТ', 'НОСОК',
+  'АЛЬПЫ', 'ГВОЗДЬ', 'ПОЕЗД', 'ТЕЛЕСКОП', 'КОРОБКА', 'КОНТРАБАНДИСТ', 'КОРОНА', 'САМОЛЁТ', 'РОБОТ', 'ЗВУК',
+  'ЯД', 'БАР', 'ИГРАТЬ', 'ОРЁЛ', 'КЛУБ', 'КОТ', 'ДИНОЗАВР', 'ПАРАШЮТ', 'ЛАЯТЬ', 'АНГЕЛ',
+  'ЛОШАДЬ', 'КРАН', 'НОТА', 'СПИНА', 'СОЛДАТ', 'АПЕЛЬСИН', 'БУЙВОЛ', 'ПИАНИНО', 'ПАРК', 'ИНДИЯ',
+  'ФИЛЬМ', 'БРЮКИ', 'БЕРЛИН', 'ТРУБА', 'МАСЛО', 'ЭКРАН', 'ОБУВЬ', 'ЦЕНТР', 'КРЮЧОК', 'СЛОНОВАЯ КОСТЬ',
+  'УДАЧА', 'ДЫРА', 'СОБАКА', 'БУЛАВКА', 'КИТАЙ', 'МЕДВЕДЬ', 'ГОЛЛИВУД', 'ВЕРШИНА', 'ХОЛОДНЫЙ', 'ЛЁД',
+  'ВЕДЬМА', 'НЫРЯЛЬЩИК', 'ПИРАМИДА', 'ЛЕТУЧАЯ МЫШЬ', 'ЗОЛОТО', 'ЧАСТЬ', 'ВАКУУМ', 'ЖИЗНЬ', 'ГРУДЬ', 'ТРУБА'
+];

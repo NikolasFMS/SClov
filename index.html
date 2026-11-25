@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Удачные слова (So Clover!)</title>
+    <meta name="description" content="Помощник для игры So Clover! (Удачные слова)" />
+    <meta property="og:title" content="Удачные слова (So Clover!)" />
+    <meta property="og:description" content="Помощник для игры So Clover! (Удачные слова)" />
+    <meta property="og:type" content="website" />
+    <meta name="theme-color" content="#15803d" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Удачные слова" />
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="icon" type="image/svg+xml" href="./icon.svg" />
+    <link rel="shortcut icon" href="./favicon.ico" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <!-- Modular Application Stylesheet -->
+    <link rel="stylesheet" href="./css/style.css" />
+    <script>
+      (function () {
+        try {
+          var scopePath = new URL("./", window.location.href).pathname;
+          var key = "udachnye_slova_so_clover::" + scopePath + "::state_v1";
+          var raw = localStorage.getItem(key);
+          var theme = null;
+          if (raw) {
+            var parsed = JSON.parse(raw);
+            if (parsed && (parsed.theme === "light" || parsed.theme === "dark")) {
+              theme = parsed.theme;
+            }
+          }
+          if (!theme) {
+            theme = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+          }
+          document.documentElement.setAttribute("data-theme", theme);
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <!-- Top Navbar -->
+    <header class="app-header">
+      <!-- Clickable Logo triggers new game / reset confirmation -->
+      <button id="btnHeaderLogo" class="header-logo-btn" title="Нажмите на логотип для сброса/новой игры">
+        <div class="header-logo-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2C9.5 2 7.5 4 7.5 6.5C7.5 7.8 8.1 9 9 9.8C8.2 9 7 8.5 5.5 8.5C3 8.5 1 10.5 1 13C1 15.5 3 17.5 5.5 17.5C6.8 17.5 8 16.9 8.8 16C8 16.8 7.5 18 7.5 19.5C7.5 22 9.5 24 12 24C14.5 24 16.5 22 16.5 19.5C16.5 18.2 15.9 17 15 16.2C15.8 17 17 17.5 18.5 17.5C21 17.5 23 15.5 23 13C23 10.5 21 8.5 18.5 8.5C17.2 8.5 16 9.1 15.2 10C16 9.2 16.5 8 16.5 6.5C16.5 4 14.5 2 12 2Z"/>
+          </svg>
+        </div>
+        <div class="header-title-box">
+          <div class="header-title-row">
+            <span id="txtHeaderTitle" class="header-title">Удачные слова</span>
+          </div>
+        </div>
+      </button>
+
+      <!-- Right Header Actions (Score, Quick Settings, Install, Rules) -->
+      <div class="header-actions">
+        <div id="scoreBadge" class="score-badge">
+          <span id="txtScoreLabel">Счёт:</span>
+          <span id="txtScoreValue" class="score-value">0</span>
+        </div>
+
+        <!-- Standalone Language Switcher Button (RU / EN) -->
+        <button id="btnToggleLang" class="btn-header btn-lang" type="button" title="Сменить язык / Switch Language" aria-label="Сменить язык / Switch Language">
+          <span id="lblCurrentLang">RU</span>
+        </button>
+
+        <!-- Quick Settings Modal Trigger (Sound, Vibration, Theme, Language) -->
+        <button id="btnOpenSettings" class="btn-header btn-icon-only" type="button" title="Быстрые настройки" aria-label="Быстрые настройки">
+          ⚙️
+        </button>
+
+        <!-- PWA Install Button -->
+        <button id="btnPwaInstall" class="btn-header btn-install-highlight" type="button" style="display: none;">
+          📲 <span id="txtInstallBtn">Установить</span>
+        </button>
+
+        <!-- Rules Button -->
+        <button id="btnOpenRules" class="btn-header btn-icon-only" type="button" title="Правила игры" aria-label="Правила игры">
+          📖
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Game Container -->
+    <main class="app-main">
+      <!-- 1. SETUP SCREEN -->
+      <section id="screenSetup" class="screen-section active">
+        <div class="hero-block">
+          <h1 id="txtHeroTitle" class="hero-title">Удачные слова</h1>
+        </div>
+
+        <!-- 1. DECK SELECTION (Выбор колоды) -->
+        <div class="card-box" id="boxDeckSelect">
+          <div class="card-box-header">
+            <div class="card-box-title">📚 <span id="txtDeckSelectHeader">Выбор колод</span></div>
+            <span class="version-tag" id="badgeTotalDecks">1 из 21</span>
+          </div>
+          <div id="decksListContainer" class="decks-grid">
+            <!-- Dynamically populated from built-in and discovered decks -->
+          </div>
+          <div class="deck-memory-bar">
+            <span id="txtDeckRemainingInfo" class="deck-remaining-info">Осталось: 220 из 220 карт</span>
+            <button type="button" id="btnResetDeckHistory" class="btn-header btn-reset-deck" disabled>
+              ↺ <span id="txtResetDeckBtn">Сбросить колоду</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. DECK USAGE MODE (Режим использования колоды) -->
+        <div class="card-box" id="boxDeckMode">
+          <div class="card-box-header">
+            <div class="card-box-title">⚙️ <span id="txtDeckModeHeader">Режим колоды</span></div>
+          </div>
+          <div class="mode-grid">
+            <button id="btnModePredefined" class="mode-card-btn active" type="button">
+              <div class="mode-card-title">
+                <span id="txtModePredefinedTitle">Оригинальные карты</span>
+                <span class="version-tag" id="badgeCardsCount">220 карт</span>
+              </div>
+              <div id="deckPredefinedDisabledNotice" class="mode-disabled-badge" style="display: none;">
+                ⚠️ <span id="txtPredefinedDisabled">Только слова</span>
+              </div>
+            </button>
+
+            <button id="btnModeRandom" class="mode-card-btn" type="button">
+              <div class="mode-card-title">
+                <span id="txtModeRandomTitle">Случайная комбинация</span>
+                <span class="version-tag" id="badgeWordsCount">880 слов</span>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. GAME MODE (Режим игры) -->
+        <div class="card-box" id="boxGameMode">
+          <div class="card-box-header">
+            <div class="card-box-title">🎮 <span id="txtGameModeHeader">Режим игры</span></div>
+            <span class="version-tag" id="badgeMarathonBest" style="display: none;">Рекорд: 0</span>
+          </div>
+          <div class="game-mode-grid">
+            <button type="button" class="game-mode-card active" data-game-mode="classic" id="btnGameModeClassic">
+              <div class="game-mode-top">
+                <span class="game-mode-name">🍀 <span id="txtGameModeClassicTitle">Классика</span></span>
+                <span class="game-mode-badge" id="txtGameModeClassicBadge">Стандарт</span>
+              </div>
+            </button>
+
+            <button type="button" class="game-mode-card" data-game-mode="hard" id="btnGameModeHard">
+              <div class="game-mode-top">
+                <span class="game-mode-name">🔥 <span id="txtGameModeHardTitle">Сложный</span></span>
+                <span class="game-mode-badge game-mode-badge--amber" id="txtGameModeHardBadge">2+ ловушки · бонус</span>
+              </div>
+            </button>
+
+            <button type="button" class="game-mode-card" data-game-mode="blitz" id="btnGameModeBlitz">
+              <div class="game-mode-top">
+                <span class="game-mode-name">⚡ <span id="txtGameModeBlitzTitle">Блиц-партия</span></span>
+                <span class="game-mode-badge game-mode-badge--blue" id="txtGameModeBlitzBadge">Общий таймер</span>
+              </div>
+            </button>
+
+            <button type="button" class="game-mode-card" data-game-mode="marathon" id="btnGameModeMarathon">
+              <div class="game-mode-top">
+                <span class="game-mode-name">❤️ <span id="txtGameModeMarathonTitle">Марафон</span></span>
+                <span class="game-mode-badge game-mode-badge--rose" id="txtGameModeMarathonBadge">3 жизни ❤️</span>
+              </div>
+            </button>
+          </div>
+
+          <div class="extra-cards-control">
+            <div class="extra-cards-label-wrap">
+              <span class="extra-cards-label">🃏 <span id="txtExtraCardsLabel">Доп. карты (ловушки)</span></span>
+              <span id="txtExtraCardsTotal" class="extra-cards-total">в лотке: 5</span>
+            </div>
+            <div class="extra-cards-stepper">
+              <button type="button" id="btnExtraCardsDec" class="btn-stepper" aria-label="−">−</button>
+              <span id="txtExtraCardsCount" class="extra-cards-value">+1</span>
+              <button type="button" id="btnExtraCardsInc" class="btn-stepper" aria-label="+">+</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. SAND TIMER / BLITZ BANK -->
+        <div class="card-box" id="boxTimerSelect">
+          <div class="card-box-header">
+            <div class="card-box-title">⏳ <span id="txtTimerSelectHeader">Песочный таймер (Ход команды)</span></div>
+          </div>
+          <div id="timerStandardGrid" class="timer-control-grid">
+            <button type="button" class="btn-timer-opt" data-timer="0" id="btnTimer0">Без таймера</button>
+            <button type="button" class="btn-timer-opt" data-timer="60" id="btnTimer60">1 мин</button>
+            <button type="button" class="btn-timer-opt active" data-timer="120" id="btnTimer120">2 мин</button>
+            <button type="button" class="btn-timer-opt" data-timer="180" id="btnTimer180">3 мин</button>
+            <button type="button" class="btn-timer-opt" data-timer="300" id="btnTimer300">5 мин</button>
+          </div>
+          <div id="timerBlitzGrid" class="timer-blitz-grid" style="display: none;">
+            <button type="button" class="btn-timer-opt btn-blitz-opt" data-blitz="300" id="btnBlitz300">5 мин</button>
+            <button type="button" class="btn-timer-opt btn-blitz-opt active" data-blitz="480" id="btnBlitz480">8 мин</button>
+            <button type="button" class="btn-timer-opt btn-blitz-opt" data-blitz="600" id="btnBlitz600">10 мин</button>
+            <button type="button" class="btn-timer-opt btn-blitz-opt" data-blitz="900" id="btnBlitz900">15 мин</button>
+          </div>
+        </div>
+
+        <!-- 5. PLAYERS ROSTER -->
+        <div class="card-box">
+          <div class="card-box-header">
+            <div class="card-box-title">👥 <span id="txtPlayersHeader">Игроки</span></div>
+          </div>
+
+          <div id="playersListContainer" class="players-list"></div>
+
+          <form id="formAddPlayer" class="add-player-form">
+            <input type="text" id="inputNewPlayer" class="input-text" placeholder="Имя игрока..." maxlength="20" required />
+            <button type="submit" class="btn-add" id="btnAddPlayer">+ Добавить</button>
+          </form>
+
+          <div class="rounds-control">
+            <span id="txtCloversPerPlayer">Клеверов на игрока:</span>
+            <div id="roundsOptionsWrap" class="rounds-btns">
+              <button type="button" class="btn-round-opt active" data-rounds="1">1</button>
+              <button type="button" class="btn-round-opt" data-rounds="2">2</button>
+            </div>
+            <span id="txtMarathonEndlessHint" class="marathon-endless-hint" style="display: none;">
+              Бесконечная серия · 3 жизни ❤️❤️❤️
+            </span>
+          </div>
+        </div>
+
+        <button type="button" id="btnStartGame" class="btn-start-game">
+          ▶ <span id="txtStartGameBtn">Начать партию</span>
+        </button>
+      </section>
+
+      <!-- 2. LEADER INTRO (PRIVACY SCREEN) -->
+      <section id="screenLeaderIntro" class="screen-section">
+        <div class="privacy-box">
+          <div class="privacy-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 6c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.9c-3.11-1.12-5.4-4.52-5.4-8.9V6.3l5.4-2.4 5.4 2.4v5.7c0 4.38-2.29 7.78-5.4 8.9z"/></svg>
+          </div>
+          <div id="txtLeaderRoundNumber" class="leader-round-kicker">Раунд 1 из 3</div>
+          <div id="txtLeaderModeStatus" class="mode-status-pill" style="display: none;"></div>
+          <h2 id="txtLeaderPassTitle" class="privacy-heading">Передайте телефон ведущему:</h2>
+          <div id="txtLeaderNameIntro" class="leader-name-highlight">Алиса</div>
+          <button type="button" id="btnUnlockLeader" class="btn-action-primary">
+            👁️ <span id="txtOpenMyClover">Открыть мой клевер</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- 3. LEADER WRITING SCREEN -->
+      <section id="screenLeaderWriting" class="screen-section">
+        <div class="status-bar-pill">
+          <div class="status-bar-label"><span id="txtLeaderLabel">Ведущий</span>: <strong id="txtLeaderNameBadge" class="text-green-accent">Алиса</strong></div>
+          <div class="status-bar-label"><span id="txtCluesCountLabel">Намёки</span>: <span id="txtCluesCountBadge" class="version-tag">0 / 4</span></div>
+        </div>
+
+        <!-- Clover Board Area -->
+        <div id="boardContainerLeader" class="clover-container"></div>
+
+        <!-- 4 Clues Inputs Form -->
+        <div class="clues-input-box">
+          <div class="clues-box-heading">
+            ✍️ <span id="txtRecord4CluesTitle">Запись 4 намёков</span>
+          </div>
+
+          <!-- North -->
+          <div class="clue-input-item">
+            <div class="clue-input-header">
+              <span class="clue-input-label">⬆️ <span id="lblNorth">Верхний намёк</span></span>
+              <span class="clue-input-words" id="previewWordsNorth">—</span>
+            </div>
+            <input type="text" id="inputClueNorth" class="input-clue-field" placeholder="Одно слово-ассоциация..." maxlength="25" />
+          </div>
+
+          <!-- East -->
+          <div class="clue-input-item">
+            <div class="clue-input-header">
+              <span class="clue-input-label">➡️ <span id="lblEast">Правый намёк</span></span>
+              <span class="clue-input-words" id="previewWordsEast">—</span>
+            </div>
+            <input type="text" id="inputClueEast" class="input-clue-field" placeholder="Одно слово-ассоциация..." maxlength="25" />
+          </div>
+
+          <!-- South -->
+          <div class="clue-input-item">
+            <div class="clue-input-header">
+              <span class="clue-input-label">⬇️ <span id="lblSouth">Нижний намёк</span></span>
+              <span class="clue-input-words" id="previewWordsSouth">—</span>
+            </div>
+            <input type="text" id="inputClueSouth" class="input-clue-field" placeholder="Одно слово-ассоциация..." maxlength="25" />
+          </div>
+
+          <!-- West -->
+          <div class="clue-input-item">
+            <div class="clue-input-header">
+              <span class="clue-input-label">⬅️ <span id="lblWest">Левый намёк</span></span>
+              <span class="clue-input-words" id="previewWordsWest">—</span>
+            </div>
+            <input type="text" id="inputClueWest" class="input-clue-field" placeholder="Одно слово-ассоциация..." maxlength="25" />
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 8px; width: 100%;">
+          <button type="button" id="btnRerollLeaderCards" class="btn-header" style="padding: 12px 14px; font-size: 13px;">
+            🔀 <span id="txtRerollBtn">Другие 4 карты</span>
+          </button>
+          <button type="button" id="btnFinishLeaderTurn" class="btn-action-primary" style="flex: 1;" disabled>
+            ✓ <span id="txtCloverReadyBtn">Заполните все 4 намёка</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- 4. TEAM HANDOFF SCREEN -->
+      <section id="screenTeamHandoff" class="screen-section">
+        <div class="privacy-box">
+          <div class="privacy-icon privacy-icon--team">
+            <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+          </div>
+          <h2 id="txtTeamTurnTitle" class="team-handoff-title">Ход команды!</h2>
+          <div id="txtLeaderSilentNotice" class="notice-banner-amber">
+            🤫 Ведущий молчит!
+          </div>
+          <div id="txtBlitzHandoffNote" class="blitz-handoff-note" style="display: none;"></div>
+          <button type="button" id="btnStartTeamGuessing" class="btn-action-primary">
+            ✓ <span id="txtTeamReadyBtn">Начать отгадывание</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- 5. TEAM GUESSING SCREEN -->
+      <section id="screenTeamGuessing" class="screen-section">
+        <div class="status-bar-pill" style="margin-bottom: 8px;">
+          <div class="status-bar-label"><span id="txtCloverOfLabel">Клевер</span>: <strong id="txtGuessingLeaderName" class="text-green-accent">Алиса</strong></div>
+          <div class="status-bar-badges">
+            <div id="badgeModeHud" class="mode-hud-badge" style="display: none;"></div>
+            <div id="badgeAttemptNum" class="version-tag attempt-badge">
+              Попытка 1 из 2
+            </div>
+          </div>
+        </div>
+
+        <!-- Sand Timer Widget (Countdown, Progress bar, Controls) -->
+        <div id="timerWidget" class="timer-widget" style="display: none;">
+          <div class="timer-top-row">
+            <div class="timer-display-group">
+              <span id="timerHourglass" class="timer-hourglass">⏳</span>
+              <span id="timerDigits" class="timer-digits">02:00</span>
+            </div>
+            <div class="timer-actions">
+              <button type="button" id="btnTimerAdd30" class="btn-timer-action" title="+30 секунд">+30 с</button>
+              <button type="button" id="btnTimerToggle" class="btn-timer-action" title="Пауза / Старт">⏸️</button>
+            </div>
+          </div>
+          <div class="timer-bar-track">
+            <div id="timerBarFill" class="timer-bar-fill" style="width: 100%;"></div>
+          </div>
+        </div>
+
+        <!-- Banner shown when time expires -->
+        <div id="timerExpiredBanner" class="timer-expired-banner">
+          <div>⏰ <span id="txtTimerExpiredNotice">Время вышло! Обсуждение окончено — проверьте решение.</span></div>
+          <button type="button" id="btnDismissTimerBanner" class="btn-header" style="font-size: 10px; padding: 2px 6px;">✕</button>
+        </div>
+
+        <!-- Clover Board Area -->
+        <div id="boardContainerTeam" class="clover-container"></div>
+
+        <!-- Tray of Available Cards -->
+        <div class="tray-box">
+          <div id="trayCardsContainer" class="tray-cards-row"></div>
+          <div class="tray-header tray-footer">
+            <div class="tray-header-info">
+              <div class="tray-title" id="txtTrayTitle">Лоток · 5 карт</div>
+            </div>
+            <div class="tray-header-actions">
+              <button type="button" id="btnShuffleTray" class="btn-header btn-tray-compact" title="Перемешать карты в лотке">
+                🔀 <span id="txtShuffleTrayBtn">Перемешать</span>
+              </button>
+              <button type="button" id="btnClearBoardToTray" class="btn-header btn-tray-compact">
+                ↺ <span id="txtResetTrayBtn">Сброс в лоток</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <button type="button" id="btnCheckSolution" class="btn-action-primary" disabled>
+          ✓ <span id="txtCheckSolutionBtn">Заполните все 4 слота клевера</span>
+        </button>
+      </section>
+
+      <!-- 6. ROUND SUMMARY SCREEN -->
+      <section id="screenSummary" class="screen-section">
+        <div class="privacy-box summary-box">
+          <div id="txtSummaryRoundTitle" class="summary-round-kicker">Итоги раунда 1</div>
+          <div id="txtSummaryLivesBadge" class="mode-status-pill" style="display: none;"></div>
+          <div class="summary-stats-row">
+            <div>
+              <div class="summary-stat-label-muted" id="txtSumLeaderLabel">Ведущий</div>
+              <div id="txtSumLeaderName" class="summary-stat-leader">Алиса</div>
+            </div>
+            <div class="summary-stat-divider"></div>
+            <div>
+              <div class="summary-stat-label-amber" id="txtSumRoundPtsLabel">За этот клевер</div>
+              <div id="txtSumRoundPts" class="summary-stat-pts">+6</div>
+            </div>
+            <div class="summary-stat-divider"></div>
+            <div>
+              <div class="summary-stat-label-green" id="txtSumTotalLabel">Общий счёт</div>
+              <div id="txtSumTotalScore" class="summary-stat-total">6</div>
+            </div>
+          </div>
+          <div id="txtSumBanner" class="summary-banner">
+            🌟 Блестящий триумф с 1-й попытки (+2 бонусных очка)!
+          </div>
+        </div>
+
+        <!-- Solution toggle buttons -->
+        <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+          <button type="button" id="btnToggleSecretView" class="btn-round-opt active">👁️ <span id="txtOriginalLeader">Оригинал ведущего</span></button>
+          <button type="button" id="btnToggleTeamView" class="btn-round-opt">✨ <span id="txtTeamGuess">Ответ команды</span></button>
+        </div>
+
+        <!-- Board display for summary -->
+        <div id="boardContainerSummary" class="clover-container"></div>
+
+        <!-- Fake card reveal -->
+        <div id="fakeCardBox" class="fake-card-box">
+          <div>
+            <span class="fake-card-label" id="txtFakeCardLabel">Ловушка</span>
+          </div>
+          <div id="fakeCardContainer" class="fake-cards-wrap"></div>
+        </div>
+
+        <button type="button" id="btnNextRoundOrFinish" class="btn-action-primary" style="max-width: 440px;">
+          <span id="txtNextRoundBtn">Следующий раунд</span> ➔
+        </button>
+
+        <button type="button" id="btnStopMarathon" class="btn-secondary-outline" style="display: none; max-width: 440px;">
+          <span id="txtStopMarathonBtn">🏁 Завершить марафон</span>
+        </button>
+      </section>
+
+      <!-- 7. GAME OVER SCREEN -->
+      <section id="screenGameOver" class="screen-section">
+        <div class="privacy-box" style="margin: 10px auto 14px;">
+          <div id="iconGameOver" style="font-size: 40px; margin-bottom: 6px;">🏆</div>
+          <h2 id="txtGameOverTitle" class="gameover-title">Партия завершена!</h2>
+          <div id="txtGameOverModeMeta" class="gameover-mode-meta" style="display: none;"></div>
+          <div class="gameover-score-row">
+            <span id="txtFinalScoreValue">0</span> <span class="gameover-points-word" id="txtFinalPointsWord">очков</span>
+          </div>
+          <div id="txtFinalRankBadge" class="gameover-rank-badge">
+            Мастера Клевера
+          </div>
+          <p id="txtFinalRankDesc" class="gameover-rank-desc">
+            Отличный результат для компании!
+          </p>
+        </div>
+
+        <!-- Chronology of all rounds -->
+        <div class="card-box" style="max-width: 440px;">
+          <div class="card-box-header">
+            <div class="card-box-title" id="txtChronologyTitle">Хроника клеверов</div>
+          </div>
+          <div id="chronologyList" style="display: flex; flex-direction: column; gap: 6px;"></div>
+        </div>
+
+        <button type="button" id="btnPlayAgain" class="btn-start-game" style="max-width: 440px;">
+          🔄 <span id="txtPlayAgainBtn">Сыграть новую партию</span>
+        </button>
+      </section>
+    </main>
+
+    <!-- Attempt Result Modal -->
+    <div id="modalAttemptResult" class="modal-backdrop">
+      <div class="modal-window" style="text-align: center; padding: 24px 20px;">
+        <div id="iconAttemptModal" style="font-size: 42px; margin-bottom: 8px;">🌟</div>
+        <h3 id="titleAttemptModal" class="attempt-modal-title">Блестяще! 6 Очков!</h3>
+        <p id="descAttemptModal" class="attempt-modal-desc">Все карты разгаданы с первой попытки!</p>
+        <button type="button" id="btnContinueAttempt" class="btn-action-primary">
+          <span id="txtContinueAttemptBtn">Продолжить</span> ➔
+        </button>
+      </div>
+    </div>
+
+    <!-- Confirm New Game / Reset Modal -->
+    <div id="modalConfirmReset" class="modal-backdrop">
+      <div class="modal-window">
+        <div class="modal-header">
+          <div class="modal-title" id="txtConfirmResetTitle">Начать новую партию?</div>
+          <button type="button" class="btn-modal-close" id="btnCloseConfirmReset">&times;</button>
+        </div>
+        <div class="modal-body" id="txtConfirmResetBody">
+          Текущий прогресс раундов и набранные очки будут сброшены. Вы уверены?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-header" id="btnCancelReset">Отмена</button>
+          <button type="button" class="btn-action-primary" id="btnExecuteReset" style="width: auto; padding: 8px 16px; background: #dc2626; color: #ffffff;">Да, сбросить</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rules Modal -->
+    <div id="modalRules" class="modal-backdrop">
+      <div class="modal-window">
+        <div class="modal-header">
+          <div class="modal-title" id="txtRulesModalTitle">Правила игры: Удачные слова (So Clover!)</div>
+          <button type="button" class="btn-modal-close" id="btnCloseRules">&times;</button>
+        </div>
+        <div class="modal-body" id="txtRulesModalContent"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn-action-primary" id="btnAckRules" style="width: auto; padding: 8px 18px;">Понятно</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- iOS Safari Install Guide Modal -->
+    <div id="modalIosInstall" class="modal-backdrop">
+      <div class="modal-window">
+        <div class="modal-header">
+          <div class="modal-title" id="txtIosInstallTitle">Установка на iPhone / iPad</div>
+          <button type="button" class="btn-modal-close" id="btnCloseIosInstall">&times;</button>
+        </div>
+        <div class="modal-body" id="txtIosInstallBody">
+          <p style="margin-bottom: 10px;">Чтобы установить игру на домашний экран и играть полностью оффлайн:</p>
+          <ol style="padding-left: 20px; line-height: 1.7;">
+            <li>Нажмите кнопку <strong>«Поделиться»</strong> (квадрат со стрелкой вверх) на панели Safari.</li>
+            <li>Прокрутите вниз и выберите <strong>«На экран «Домой»</strong> (Add to Home Screen).</li>
+            <li>Нажмите <strong>«Добавить»</strong> — игра появится как отдельное приложение с собственными сохранениями!</li>
+          </ol>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-action-primary" id="btnAckIosInstall" style="width: auto; padding: 8px 18px;">Понятно</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Settings Modal (Mobile-first width, accessible anytime) -->
+    <div id="modalSettings" class="modal-backdrop">
+      <div class="modal-window modal-settings-window">
+        <div class="modal-header">
+          <div class="modal-title" id="txtSettingsModalTitle">Быстрые настройки</div>
+          <button type="button" class="btn-modal-close" id="btnCloseSettings">&times;</button>
+        </div>
+        <div class="modal-body settings-modal-body">
+          <div class="settings-list">
+            <!-- Sound Toggle -->
+            <div class="settings-row">
+              <div class="prefs-info">
+                <span class="prefs-title" id="txtSoundLabel">🔊 Звуковые эффекты</span>
+              </div>
+              <button type="button" id="btnToggleSound" class="toggle-switch active" role="switch" aria-checked="true" aria-labelledby="txtSoundLabel">
+                <span class="toggle-knob"></span>
+              </button>
+            </div>
+
+            <!-- Vibration Toggle -->
+            <div class="settings-row">
+              <div class="prefs-info">
+                <span class="prefs-title" id="txtVibrationLabel">📳 Вибрация</span>
+              </div>
+              <button type="button" id="btnToggleVibration" class="toggle-switch active" role="switch" aria-checked="true" aria-labelledby="txtVibrationLabel">
+                <span class="toggle-knob"></span>
+              </button>
+            </div>
+
+            <!-- Theme Selector -->
+            <div class="settings-row settings-row--stacked">
+              <span class="prefs-title" id="txtThemeLabel">🎨 Тема оформления</span>
+              <div class="segmented-control" role="group" aria-labelledby="txtThemeLabel">
+                <button type="button" id="btnThemeDark" class="segmented-btn active">🌙 Тёмная</button>
+                <button type="button" id="btnThemeLight" class="segmented-btn">☀️ Светлая</button>
+              </div>
+            </div>
+
+            <!-- Language Selector -->
+            <div class="settings-row settings-row--stacked">
+              <span class="prefs-title" id="txtLangLabel">🌐 Язык интерфейса</span>
+              <div class="segmented-control" role="group" aria-labelledby="txtLangLabel">
+                <button type="button" id="btnLangRu" class="segmented-btn active">🇷🇺 Русский</button>
+                <button type="button" id="btnLangEn" class="segmented-btn">🇬🇧 English</button>
+              </div>
+            </div>
+
+            <!-- Safe App Reinstall / Update (preserves local saves & records) -->
+            <div class="settings-row settings-row--stacked settings-row--maintenance">
+              <div class="prefs-info">
+                <span class="prefs-title" id="txtReinstallLabel">🔄 Обновление приложения</span>
+              </div>
+              <button type="button" id="btnReinstallApp" class="btn-reinstall-app">
+                🔄 <span id="txtReinstallBtn">Переустановить и обновить</span>
+              </button>
+              <div id="txtReinstallStatus" class="settings-inline-status" style="display: none;" role="status" aria-live="polite"></div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-action-primary" id="btnDoneSettings" style="width: auto; padding: 8px 20px;">Готово</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reload Recovery Toast -->
+    <div id="restoreToast" class="restore-toast" role="status" aria-live="polite"></div>
+
+    <!-- Offline Mode Status Indicator -->
+    <div id="offlineIndicator" class="offline-indicator" role="status" aria-live="polite">
+      <span class="offline-dot"></span>
+      <span id="txtOfflineBadge">Оффлайн режим — сохранённые данные и колоды активны</span>
+    </div>
+
+    <!-- Complete Vanilla Application Script -->
+    <script type="module" src="./js/main.js"></script>
+  </body>
+</html>
